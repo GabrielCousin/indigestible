@@ -64,6 +64,7 @@ def main():
 
                 if result['success']:
                     logger.info(f"Title: {result['title']}")
+                    logger.info(f"Format: {result.get('format', 'text')}")
                     logger.info(f"Content length: {len(result['content'])} characters")
                     logger.info(f"\nContent preview (first 500 chars):")
                     logger.info("-" * 80)
@@ -79,13 +80,16 @@ def main():
             for result in results:
                 if result['success']:
                     source_name = result['source_name'].replace(' ', '_').lower()
-                    output_file = output_dir / f"{source_name}_content.txt"
+                    output_format = result.get('format', 'text')
+                    file_extension = 'md' if output_format == 'markdown' else 'txt'
+                    output_file = output_dir / f"{source_name}_content.{file_extension}"
 
                     with open(output_file, 'w', encoding='utf-8') as f:
                         f.write(f"Source: {result['source_name']}\n")
                         f.write(f"URL: {result['url']}\n")
                         f.write(f"Title: {result['title']}\n")
                         f.write(f"Frequency: {result['frequency']}\n")
+                        f.write(f"Format: {output_format}\n")
                         f.write("\n" + "="*80 + "\n")
                         f.write("CONTENT\n")
                         f.write("="*80 + "\n\n")

@@ -4,7 +4,8 @@ Module for fetching and parsing HTML content from newsletter sources.
 
 import requests
 from bs4 import BeautifulSoup
-from typing import Optional, Dict, Any
+from markdownify import markdownify as md
+from typing import Optional, Dict, Any, Literal
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,9 @@ class ContentFetcher:
     def fetch_content(
         self,
         url: str,
-        selector: Optional[str] = None
+        selector: Optional[str] = None,
+        ignore_selectors: Optional[list] = None,
+        output_format: Literal["text", "markdown"] = "markdown"
     ) -> Dict[str, Any]:
         """
         Fetch HTML content from a URL and optionally filter by CSS selector.
@@ -37,9 +40,11 @@ class ContentFetcher:
         Args:
             url: The URL to fetch
             selector: Optional CSS selector to filter content
+            ignore_selectors: Optional list of CSS selectors to remove from content
+            output_format: Output format - "text" for plain text or "markdown" for markdown
 
         Returns:
-            Dictionary with 'url', 'title', 'content', and 'raw_html'
+            Dictionary with 'url', 'title', 'content', 'raw_html', and 'format'
 
         Raises:
             requests.RequestException: If the request fails
@@ -51,6 +56,31 @@ class ContentFetcher:
             response.raise_for_status()
 
             soup = BeautifulSoup(response.content, 'lxml')
+
+            # Remove unwanted elements early (before selector filtering)
+            # Remove all script tags (including JSON-LD)
+            for script in soup.find_all('script'):
+                script.decompose()
+
+            # Remove all style tags
+            for style in soup.find_all('style'):
+                style.decompose()
+
+            # Remove all images
+            for img in soup.find_all('img'):
+                img.decompose()
+
+            # Remove picture elements
+            for picture in soup.find_all('picture'):
+                picture.decompose()
+
+            # Remove SVG elements (often used as icons/images)
+            for svg in soup.find_all('svg'):
+                svg.decompose()
+
+            # Remove inline styles
+            for tag in soup.find_all(style=True):
+                del tag['style']
 
             # Extract title
             title = soup.find('title')
@@ -72,25 +102,60 @@ class ContentFetcher:
             else:
                 content_soup = soup
 
-            # Extract text content
-            text_content = content_soup.get_text(separator='\n', strip=True)
+            # Remove ignored elements
+            if ignore_selectors:
+                removed_count = 0
+                for ignore_selector in ignore_selectors:
+                    elements_to_remove = content_soup.select(ignore_selector)
+                    for element in elements_to_remove:
+                        element.decompose()
+                        removed_count += 1
+                if removed_count > 0:
+                    logger.info(f"Removed {removed_count} element(s) using ignore selectors")
 
-            # Clean up multiple newlines
-            text_content = '\n'.join(
-                line for line in text_content.split('\n')
-                if line.strip()
-            )
+            # Convert to desired format
+            if output_format == "markdown":
+                # Convert HTML to Markdown
+                content = md(
+                    str(content_soup),
+                    heading_style="ATX",  # Use # style headings
+                    bullets="-",  # Use - for unordered lists
+                    strong_em_symbol="**",  # Use ** for bold
+                    strip=['script', 'style']  # Remove script and style tags
+                )
+                # Clean up extra whitespace while preserving structure
+                lines = content.split('\n')
+                cleaned_lines = []
+                prev_empty = False
+                for line in lines:
+                    line = line.rstrip()
+                    is_empty = len(line) == 0
+                    # Allow max one empty line between content
+                    if not is_empty or not prev_empty:
+                        cleaned_lines.append(line)
+                    prev_empty = is_empty
+                content = '\n'.join(cleaned_lines).strip()
+            else:
+                # Extract plain text
+                content = content_soup.get_text(separator='\n', strip=True)
+                # Clean up multiple newlines
+                content = '\n'.join(
+                    line for line in content.split('\n')
+                    if line.strip()
+                )
 
             result = {
                 'url': url,
                 'title': title_text,
-                'content': text_content,
+                'content': content,
                 'raw_html': str(content_soup),
+                'format': output_format,
                 'success': True
             }
 
             logger.info(f"Successfully fetched content from {url}")
-            logger.info(f"Content length: {len(text_content)} characters")
+            logger.info(f"Content length: {len(content)} characters")
+            logger.info(f"Output format: {output_format}")
 
             return result
 
@@ -124,7 +189,9 @@ class ContentFetcher:
 
             result = self.fetch_content(
                 url=source['url'],
-                selector=source.get('selector')
+                selector=source.get('selector'),
+                ignore_selectors=source.get('ignore_selectors'),
+                output_format=source.get('output_format', 'markdown')
             )
             result['source_name'] = source.get('name', source['url'])
             result['frequency'] = source.get('frequency', 'unknown')

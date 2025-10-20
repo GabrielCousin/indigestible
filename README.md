@@ -6,9 +6,11 @@ A Python-based newsletter aggregator that fetches, processes, and organizes tech
 
 - 🔍 **Configurable Content Fetching**: Fetch content from multiple newsletter sources
 - 🎯 **CSS Selector Support**: Extract specific content using CSS selectors
+- 🚫 **Element Filtering**: Remove unwanted elements (ads, forms, navigation) with ignore selectors
+- 📝 **Markdown Conversion**: Convert HTML to clean, well-formatted Markdown automatically
 - 📅 **Frequency Tracking**: Track publication frequency (daily, weekly, monthly)
 - 🤖 **AI-Powered Organization**: (Coming soon) Group content by themes and remove duplicates
-- 📝 **GitHub Issues**: (Coming soon) Automatically create GitHub issues with curated content
+- 🔄 **GitHub Issues**: (Coming soon) Automatically create GitHub issues with curated content
 
 ## Installation
 
@@ -63,6 +65,11 @@ sources:
     url: "https://console.dev/"
     frequency: "weekly"
     selector: "main"  # Optional CSS selector
+    ignore_selectors:  # Optional list to remove unwanted elements
+      - "header"
+      - "nav"
+      - "footer"
+      - "form"
     enabled: true
 ```
 
@@ -72,6 +79,8 @@ sources:
 - **url**: The URL to fetch content from
 - **frequency**: Publication frequency (daily, weekly, biweekly, monthly)
 - **selector**: Optional CSS selector to extract specific content
+- **ignore_selectors**: Optional list of CSS selectors to remove (e.g., ads, forms, navigation)
+- **output_format**: Output format - `"markdown"` (default) or `"text"`
 - **enabled**: Whether to process this source (true/false)
 
 ## Usage
@@ -113,7 +122,26 @@ This will:
 ### Output
 
 - Console logs show processing status and content previews
-- Full content is saved to `output/<source_name>_content.txt`
+- Full content is saved to `output/<source_name>_content.md` (or `.txt` for plain text format)
+- Markdown output includes proper formatting: headings, links, lists, emphasis
+
+### Markdown Conversion Features
+
+The `markdownify` library provides excellent HTML-to-Markdown conversion:
+- **Headings**: `<h1>` → `#`, `<h2>` → `##`, etc.
+- **Links**: `<a href="...">text</a>` → `[text](...)`
+- **Lists**: Proper bullet (`-`) and numbered lists
+- **Emphasis**: `<strong>` → `**bold**`, `<em>` → `*italic*`
+- **Code**: `<code>` and `<pre>` blocks preserved
+- Automatic cleanup of extra whitespace
+
+### Automatic Content Cleanup
+
+The fetcher automatically removes noisy elements:
+- **Scripts**: All `<script>` tags including JSON-LD structured data
+- **Styles**: All `<style>` tags and inline `style` attributes
+- **Images**: All `<img>`, `<picture>`, and `<svg>` tags
+- Perfect for text-focused AI processing!
 
 ## Project Structure
 

@@ -3,6 +3,16 @@ sources:
     url: "https://console.dev/"
     frequency: "weekly"  # daily, weekly, biweekly, monthly
     selector: "main"  # CSS selector to extract content, null for entire page
+    ignore_selectors:  # Optional list of selectors to remove from content
+      - "main > div:first-child"
+      - "main section:last-child"
+    output_format: "markdown"  # "markdown" or "text"
+    enabled: true
+
+  - name: "Web Weekly"
+    url: "https://www.stefanjudis.com/newsletter-frame/"
+    frequency: "weekly"
+    output_format: "markdown"
     enabled: true
 
   # Add more sources here
@@ -10,6 +20,11 @@ sources:
   #   url: "https://example.com"
   #   frequency: "weekly"
   #   selector: ".newsletter-content"
+  #   ignore_selectors:
+  #     - ".ads"
+  #     - ".social-share"
+  #     - "footer"
+  #   output_format: "markdown"
   #   enabled: true
 
 # AI Configuration
