@@ -1,0 +1,23 @@
+sources:
+  - name: "Console.dev"
+    url: "https://console.dev/"
+    frequency: "weekly"  # daily, weekly, biweekly, monthly
+    selector: "main"  # CSS selector to extract content, null for entire page
+    enabled: true
+
+  # Add more sources here
+  # - name: "Another Newsletter"
+  #   url: "https://example.com"
+  #   frequency: "weekly"
+  #   selector: ".newsletter-content"
+  #   enabled: true
+
+# AI Configuration
+ai:
+  model: "gpt-4o-mini"
+  temperature: 0.7
+
+# GitHub Configuration
+github:
+  create_issues: true
+  issue_labels: ["newsletter", "automated"]
