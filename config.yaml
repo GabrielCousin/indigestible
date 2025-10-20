@@ -1,12 +1,12 @@
 sources:
   - name: "Console.dev"
     url: "https://console.dev/"
-    frequency: "weekly"  # daily, weekly, biweekly, monthly
-    selector: "main"  # CSS selector to extract content, null for entire page
-    ignore_selectors:  # Optional list of selectors to remove from content
+    frequency: "weekly"
+    selector: "main"
+    ignore_selectors:
       - "main > div:first-child"
       - "main section:last-child"
-    output_format: "markdown"  # "markdown" or "text"
+    output_format: "markdown"
     enabled: true
 
   - name: "Web Weekly"
@@ -15,17 +15,88 @@ sources:
     output_format: "markdown"
     enabled: true
 
-  # Add more sources here
-  # - name: "Another Newsletter"
-  #   url: "https://example.com"
-  #   frequency: "weekly"
-  #   selector: ".newsletter-content"
-  #   ignore_selectors:
-  #     - ".ads"
-  #     - ".social-share"
-  #     - "footer"
-  #   output_format: "markdown"
-  #   enabled: true
+  - name: "React Status"
+    url: "https://react.statuscode.com/latest"
+    frequency: "weekly"
+    selector: "table.email-body"
+    ignore_selectors:
+      - ".footer"
+      - ".sponsor"
+    output_format: "markdown"
+    enabled: true
+
+  - name: "Node Weekly"
+    url: "https://nodeweekly.com/latest"
+    frequency: "weekly"
+    selector: "table.email-body"
+    ignore_selectors:
+      - ".footer"
+      - ".sponsor"
+    output_format: "markdown"
+    enabled: true
+
+  - name: "JavaScript Weekly"
+    url: "https://javascriptweekly.com/latest"
+    frequency: "weekly"
+    selector: "table.email-body"
+    ignore_selectors:
+      - ".footer"
+      - ".sponsor"
+    output_format: "markdown"
+    enabled: true
+
+  - name: "This Week in React"
+    url: "https://thisweekinreact.com/newsletter"
+    frequency: "weekly"
+    selector: "article"
+    ignore_selectors:
+      - "nav"
+      - "footer"
+      - ".subscribe-form"
+    output_format: "markdown"
+    enabled: false
+
+  - name: "Sidebar"
+    url: "https://sidebar.io/"
+    frequency: "daily"
+    selector: ".items"
+    ignore_selectors:
+      - ".ads"
+      - "footer"
+      - "nav"
+    output_format: "markdown"
+    enabled: false
+
+  - name: "Frontend Focus"
+    url: "https://frontendfoc.us/issues/"
+    frequency: "weekly"
+    selector: "table.email-body"
+    ignore_selectors:
+      - ".footer"
+      - ".sponsor"
+    output_format: "markdown"
+    enabled: true
+
+  - name: "Next.js Weekly"
+    url: "https://nextjsweekly.com/issues/latest"
+    frequency: "weekly"
+    selector: "table.email-body"
+    ignore_selectors:
+      - ".footer"
+      - ".sponsor"
+    output_format: "markdown"
+    enabled: true
+
+  - name: "Piccalilli"
+    url: "https://piccalil.li/the-index/archive/"
+    frequency: "irregular"
+    selector: "article"
+    ignore_selectors:
+      - "nav"
+      - "footer"
+      - ".subscribe"
+    output_format: "markdown"
+    enabled: false
 
 # AI Configuration
 ai:

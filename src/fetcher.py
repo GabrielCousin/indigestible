@@ -121,20 +121,63 @@ class ContentFetcher:
                     heading_style="ATX",  # Use # style headings
                     bullets="-",  # Use - for unordered lists
                     strong_em_symbol="**",  # Use ** for bold
-                    strip=['script', 'style']  # Remove script and style tags
+                    strip=['script', 'style', 'table', 'thead', 'tbody', 'tr', 'td', 'th']  # Remove tables and their elements
                 )
-                # Clean up extra whitespace while preserving structure
+                # Clean up extra whitespace while improving readability
                 lines = content.split('\n')
                 cleaned_lines = []
                 prev_empty = False
-                for line in lines:
+                empty_count = 0
+
+                for i, line in enumerate(lines):
                     line = line.rstrip()
                     is_empty = len(line) == 0
-                    # Allow max one empty line between content
-                    if not is_empty or not prev_empty:
+
+                    # Allow up to 2 consecutive empty lines
+                    if is_empty:
+                        empty_count += 1
+                        if empty_count <= 2:
+                            cleaned_lines.append(line)
+                    else:
+                        empty_count = 0
                         cleaned_lines.append(line)
+
+                        # Add extra spacing after headings for readability
+                        if line.startswith('#'):
+                            cleaned_lines.append('')
+                        # Add spacing after links that end sentences (likely article titles)
+                        elif line.endswith(')') and '[' in line and '](' in line:
+                            # Check if next line is not empty and doesn't start with - or #
+                            if i + 1 < len(lines) and lines[i + 1].strip() and not lines[i + 1].strip().startswith(('-', '#', '*')):
+                                cleaned_lines.append('')
+
                     prev_empty = is_empty
+
                 content = '\n'.join(cleaned_lines).strip()
+
+                # Add paragraph breaks between long text blocks
+                # Split content that's too long without breaks
+                paragraphs = content.split('\n\n')
+                formatted_paragraphs = []
+                for para in paragraphs:
+                    # Split on double spaces which often separate articles/sections in newsletters
+                    if '  ' in para and len(para) > 300:
+                        # Split on patterns like "Author  [Title" or "Text  [Link"
+                        import re
+                        # Replace "  [" with "\n\n[" to separate articles
+                        para = re.sub(r'  +\[', '\n\n[', para)
+                        # Replace "Author  Text" patterns (word followed by double space and capital letter)
+                        para = re.sub(r'([a-z])  +([A-Z🎯📄🛠💻🔧])', r'\1\n\n\2', para)
+                        # Split on emoji section markers
+                        para = re.sub(r'  +(📰|📢|🛠|💻|🔧)', r'\n\n\1', para)
+
+                    # If still very long, try sentence splitting
+                    if len(para) > 500 and '. ' in para and para.count('.') > 3:
+                        sentences = para.split('.  ')
+                        formatted_paragraphs.append('\n\n'.join(sentences))
+                    else:
+                        formatted_paragraphs.append(para)
+                content = '\n\n'.join(formatted_paragraphs)
             else:
                 # Extract plain text
                 content = content_soup.get_text(separator='\n', strip=True)
