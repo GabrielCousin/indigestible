@@ -96,6 +96,7 @@ class ContentSummarizer:
    - IGNORE framework-specific content EXCEPT React and Node.js
    - REMOVE all sponsor content and advertisements
    - IGNORE job postings and classifieds
+   - REMOVE duplicate items (same news from multiple sources - include once only)
 
 3. **Link handling:**
    - Extract and use FINAL destination URLs (follow redirects in your understanding)
@@ -108,12 +109,17 @@ class ContentSummarizer:
    - Group related items together
    - Order by importance/relevance within each section
    - Don't mention source names or newsletters
+   - Keep descriptions concise (1-2 sentences max)
 
 5. **Content focus:**
    - Focus on tutorials, libraries, tools, and updates
    - Include version numbers for releases
    - Highlight breaking changes or major features
-   - Keep descriptions concise (1-2 sentences max)
+
+6. **Length constraint:**
+   - Output MUST be under 65536 characters total
+   - Be direct and concise
+   - Prioritize most important/interesting items
 
 # Newsletter Content:
 
