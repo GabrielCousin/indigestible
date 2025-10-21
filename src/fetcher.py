@@ -27,6 +27,65 @@ class ContentFetcher:
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
         })
 
+    def fetch_link_from_list(
+        self,
+        list_url: str,
+        link_selector: str,
+        link_index: int = 0
+    ) -> Optional[str]:
+        """
+        Fetch a URL from a list/archive page using a CSS selector.
+
+        Args:
+            list_url: The URL of the list/archive page
+            link_selector: CSS selector to find the target link
+            link_index: Which matched link to use (default: 0 for first)
+
+        Returns:
+            The extracted URL, or None if not found
+
+        Raises:
+            requests.RequestException: If the request fails
+        """
+        logger.info(f"Fetching link from list page: {list_url}")
+        logger.info(f"Using selector: {link_selector}")
+
+        try:
+            response = self.session.get(list_url, timeout=self.timeout)
+            response.raise_for_status()
+
+            soup = BeautifulSoup(response.content, 'lxml')
+
+            # Find all matching links
+            links = soup.select(link_selector)
+
+            if not links:
+                logger.warning(f"No links found with selector: {link_selector}")
+                return None
+
+            if link_index >= len(links):
+                logger.warning(f"Link index {link_index} out of range. Found {len(links)} link(s)")
+                link_index = 0
+
+            # Get the href from the selected link
+            target_link = links[link_index]
+            href = target_link.get('href')
+
+            if not href:
+                logger.warning(f"Selected link has no href attribute")
+                return None
+
+            # Handle relative URLs
+            from urllib.parse import urljoin
+            absolute_url = urljoin(list_url, href)
+
+            logger.info(f"Extracted URL: {absolute_url}")
+            return absolute_url
+
+        except requests.RequestException as e:
+            logger.error(f"Failed to fetch list page {list_url}: {str(e)}")
+            return None
+
     def fetch_content(
         self,
         url: str,
@@ -218,7 +277,7 @@ class ContentFetcher:
         Fetch content from multiple sources.
 
         Args:
-            sources: List of source dictionaries with 'url' and optional 'selector'
+            sources: List of source dictionaries with 'url' or 'list_page' and optional 'selector'
 
         Returns:
             List of content dictionaries
@@ -227,16 +286,80 @@ class ContentFetcher:
 
         for source in sources:
             if not source.get('enabled', True):
-                logger.info(f"Skipping disabled source: {source.get('name', source['url'])}")
+                logger.info(f"Skipping disabled source: {source.get('name', 'unknown')}")
                 continue
 
+            source_name = source.get('name', 'unknown')
+
+            # Determine the target URL
+            target_url = None
+
+            # Check if this is a two-step fetch (list page)
+            if 'list_page' in source:
+                list_config = source['list_page']
+                list_url = list_config.get('url')
+                link_selector = list_config.get('link_selector')
+                link_index = list_config.get('link_index', 0)
+
+                if not list_url or not link_selector:
+                    logger.error(f"Invalid list_page config for {source_name}: missing url or link_selector")
+                    results.append({
+                        'url': '',
+                        'title': '',
+                        'content': '',
+                        'raw_html': '',
+                        'source_name': source_name,
+                        'frequency': source.get('frequency', 'unknown'),
+                        'success': False,
+                        'error': 'Invalid list_page configuration'
+                    })
+                    continue
+
+                # Fetch the target URL from the list page
+                target_url = self.fetch_link_from_list(
+                    list_url=list_url,
+                    link_selector=link_selector,
+                    link_index=link_index
+                )
+
+                if not target_url:
+                    logger.error(f"Could not extract link from list page for {source_name}")
+                    results.append({
+                        'url': list_url,
+                        'title': '',
+                        'content': '',
+                        'raw_html': '',
+                        'source_name': source_name,
+                        'frequency': source.get('frequency', 'unknown'),
+                        'success': False,
+                        'error': 'Could not extract link from list page'
+                    })
+                    continue
+            elif 'url' in source:
+                # Direct URL (original behavior)
+                target_url = source['url']
+            else:
+                logger.error(f"Source {source_name} has neither 'url' nor 'list_page'")
+                results.append({
+                    'url': '',
+                    'title': '',
+                    'content': '',
+                    'raw_html': '',
+                    'source_name': source_name,
+                    'frequency': source.get('frequency', 'unknown'),
+                    'success': False,
+                    'error': 'No url or list_page specified'
+                })
+                continue
+
+            # Fetch the content from the target URL
             result = self.fetch_content(
-                url=source['url'],
+                url=target_url,
                 selector=source.get('selector'),
                 ignore_selectors=source.get('ignore_selectors'),
                 output_format=source.get('output_format', 'markdown')
             )
-            result['source_name'] = source.get('name', source['url'])
+            result['source_name'] = source_name
             result['frequency'] = source.get('frequency', 'unknown')
             results.append(result)
 

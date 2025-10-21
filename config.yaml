@@ -20,8 +20,11 @@ sources:
     frequency: "weekly"
     selector: "table.email-body"
     ignore_selectors:
-      - ".footer"
-      - ".sponsor"
+      - "nav"
+      - ".el-splitbar"
+      - ".subscribe_box"
+      - "#together"
+      - ".pager"
     output_format: "markdown"
     enabled: true
 
@@ -30,8 +33,11 @@ sources:
     frequency: "weekly"
     selector: "table.email-body"
     ignore_selectors:
-      - ".footer"
-      - ".sponsor"
+      - "nav"
+      - ".el-splitbar"
+      - ".subscribe_box"
+      - "#together"
+      - ".pager"
     output_format: "markdown"
     enabled: true
 
@@ -40,13 +46,18 @@ sources:
     frequency: "weekly"
     selector: "table.email-body"
     ignore_selectors:
-      - ".footer"
-      - ".sponsor"
+      - "nav"
+      - ".el-splitbar"
+      - ".subscribe_box"
+      - "#together"
+      - ".pager"
     output_format: "markdown"
     enabled: true
 
   - name: "This Week in React"
-    url: "https://thisweekinreact.com/newsletter"
+    list_page:
+      url: "https://thisweekinreact.com/newsletter"
+      link_selector: "nav:not(.navbar) a"
     frequency: "weekly"
     selector: "article"
     ignore_selectors:
@@ -54,49 +65,49 @@ sources:
       - "footer"
       - ".subscribe-form"
     output_format: "markdown"
-    enabled: false
+    enabled: true
 
   - name: "Sidebar"
     url: "https://sidebar.io/"
     frequency: "daily"
-    selector: ".items"
-    ignore_selectors:
-      - ".ads"
-      - "footer"
-      - "nav"
+    selector: ".post-days"
     output_format: "markdown"
-    enabled: false
+    enabled: true
 
   - name: "Frontend Focus"
     url: "https://frontendfoc.us/issues/"
     frequency: "weekly"
     selector: "table.email-body"
     ignore_selectors:
-      - ".footer"
-      - ".sponsor"
+      - "nav"
+      - ".el-splitbar"
+      - ".subscribe_box"
+      - "#together"
+      - ".pager"
     output_format: "markdown"
     enabled: true
 
   - name: "Next.js Weekly"
     url: "https://nextjsweekly.com/issues/latest"
     frequency: "weekly"
-    selector: "table.email-body"
+    selector: "#content"
     ignore_selectors:
+      - "[data-id='react-email-row']"
       - ".footer"
-      - ".sponsor"
     output_format: "markdown"
     enabled: true
 
   - name: "Piccalilli"
-    url: "https://piccalil.li/the-index/archive/"
+    list_page:
+      url: "https://piccalil.li/the-index/archive/"
+      link_selector: ".post-list a"
     frequency: "irregular"
     selector: "article"
     ignore_selectors:
-      - "nav"
-      - "footer"
-      - ".subscribe"
+      - ".promo-box"
+      - ".user-form"
     output_format: "markdown"
-    enabled: false
+    enabled: true
 
 # AI Configuration
 ai:
