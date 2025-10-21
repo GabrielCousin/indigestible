@@ -9,7 +9,7 @@ A Python-based newsletter aggregator that fetches, processes, and organizes tech
 - 🚫 **Element Filtering**: Remove unwanted elements (ads, forms, navigation) with ignore selectors
 - 📝 **Markdown Conversion**: Convert HTML to clean, well-formatted Markdown automatically
 - 📅 **Frequency Tracking**: Track publication frequency (daily, weekly, monthly)
-- 🤖 **AI-Powered Organization**: (Coming soon) Group content by themes and remove duplicates
+- 🤖 **AI-Powered Summarization**: Group content by themes using OpenAI
 - 🔄 **GitHub Issues**: (Coming soon) Automatically create GitHub issues with curated content
 
 ## Installation
@@ -70,11 +70,17 @@ sources:
       - "nav"
       - "footer"
       - "form"
+    output_format: "markdown"
     enabled: true
+
+ai:
+  model: "gpt-4o-mini"  # OpenAI model
+  temperature: 0.7
 ```
 
 ### Configuration Options
 
+#### Newsletter Sources
 - **name**: A friendly name for the source
 - **url**: The URL to fetch content from
 - **frequency**: Publication frequency (daily, weekly, biweekly, monthly)
@@ -83,15 +89,51 @@ sources:
 - **output_format**: Output format - `"markdown"` (default) or `"text"`
 - **enabled**: Whether to process this source (true/false)
 
+#### AI Configuration
+- **model**: OpenAI model to use (e.g., `gpt-4o-mini`, `gpt-5-nano`, `gpt-4o`)
+- **temperature**: Creativity level (0.0-1.0, default: 0.7) - note: not supported by GPT-5/o1 models
+
 ## Usage
 
 ### Basic Usage
 
-Run the aggregator:
+1. **Fetch newsletters:**
 ```bash
 source .venv/bin/activate  # If not already activated
 python src/main.py
 ```
+
+2. **Generate AI summary:**
+
+First, create a `.env` file with your OpenAI API key:
+```bash
+echo "OPENAI_API_KEY=your-api-key-here" > .env
+```
+
+Then configure your model in `config.yaml`:
+```yaml
+ai:
+  model: "gpt-4o-mini"  # or gpt-5-nano, gpt-4o, etc.
+```
+
+Run the summarizer:
+```bash
+python src/summarize.py
+```
+
+This will create `output/SUMMARY.md` with an organized summary grouped by:
+- React
+- JavaScript
+- Updates
+- New Tools
+- Design
+- Misc
+
+The summary automatically:
+- Removes sponsor content and ads
+- Filters out React Native and mobile-specific content
+- Cleans URLs and removes tracking parameters
+- Groups content by theme (not by source)
 
 ### Managing Dependencies with uv
 
@@ -151,23 +193,40 @@ indigestible/
 │   ├── __init__.py
 │   ├── config.py        # Configuration management
 │   ├── fetcher.py       # HTML fetching and parsing
-│   └── main.py          # Main execution script
-├── config.yaml          # Source configuration
-├── requirements.txt     # Python dependencies
+│   ├── main.py          # Main execution script
+│   ├── summarizer.py    # AI-powered summarization
+│   └── summarize.py     # Summary generation script
+├── config.yaml          # Source & AI configuration
+├── pyproject.toml       # Project metadata & dependencies
+├── uv.lock              # Locked dependency versions
+├── .env                 # API keys (not committed)
 ├── .gitignore
 └── README.md
 ```
+
+## Supported Models
+
+### OpenAI Models
+- **GPT-4o models**: `gpt-4o`, `gpt-4o-mini` - Latest generation, great balance of speed and quality
+- **GPT-5 models**: `gpt-5-nano` - Newest generation with larger context windows
+- **o1 models**: `o1-preview`, `o1-mini` - Advanced reasoning models
+- **Legacy**: `gpt-4-turbo`, `gpt-3.5-turbo`
+
+**API Key**: Set `OPENAI_API_KEY` or `OPEN_AI_API_KEY` in `.env`
+
+**Note**: GPT-5 and o1 models use `max_completion_tokens` instead of `max_tokens` and have fixed temperature settings.
 
 ## Roadmap
 
 ### Current Version (v0.1)
 - ✅ Configurable source management
 - ✅ HTML fetching with CSS selector filtering
-- ✅ Basic content extraction
+- ✅ Markdown conversion
+- ✅ AI-powered summarization with OpenAI
+- ✅ Support for GPT-4o, GPT-5, and o1 models
 
 ### Upcoming Features
 - 🔄 Duplicate detection and removal
-- 🏷️ AI-powered theme grouping
 - 🐙 GitHub issue creation
 - 📊 Content analysis and statistics
 - 🔔 GitHub Actions integration
