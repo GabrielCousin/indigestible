@@ -80,42 +80,6 @@ jobs:
             # Add the AI summary content (skip any metadata lines at the top)
             tail -n +1 "output/SUMMARY.md" >> "$ISSUE_FILE"
 
-            # Add collapsible section with raw content
-            echo "" >> "$ISSUE_FILE"
-            echo "" >> "$ISSUE_FILE"
-            echo "---" >> "$ISSUE_FILE"
-            echo "" >> "$ISSUE_FILE"
-            echo "## 📄 Raw Newsletter Content" >> "$ISSUE_FILE"
-            echo "" >> "$ISSUE_FILE"
-            echo "<details>" >> "$ISSUE_FILE"
-            echo "<summary>Click to view full raw content from all newsletters</summary>" >> "$ISSUE_FILE"
-            echo "" >> "$ISSUE_FILE"
-
-            # List all sources
-            for file in output/*_content.md; do
-              if [ -f "$file" ]; then
-                basename=$(basename "$file" _content.md)
-                source_name=$(echo "$basename" | sed 's/_/ /g' | sed 's/\b\(.\)/\u\1/g')
-
-                echo "" >> "$ISSUE_FILE"
-                echo "### $source_name" >> "$ISSUE_FILE"
-                echo "" >> "$ISSUE_FILE"
-
-                # Add nested collapsible for each source
-                echo "<details>" >> "$ISSUE_FILE"
-                echo "<summary>Expand ${source_name}</summary>" >> "$ISSUE_FILE"
-                echo "" >> "$ISSUE_FILE"
-                echo '```markdown' >> "$ISSUE_FILE"
-                tail -n +7 "$file" >> "$ISSUE_FILE"
-                echo '```' >> "$ISSUE_FILE"
-                echo "</details>" >> "$ISSUE_FILE"
-                echo "" >> "$ISSUE_FILE"
-              fi
-            done
-
-            echo "" >> "$ISSUE_FILE"
-            echo "</details>" >> "$ISSUE_FILE"
-
           else
             echo "No AI summary found, using raw content"
 

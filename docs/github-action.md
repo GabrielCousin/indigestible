@@ -66,18 +66,13 @@ Each generated issue includes:
 - Issue title: `🤖 AI Newsletter Digest - [Date]` (or `📰 Newsletter Digest - [Date]` if AI summary fails)
 - Brief description noting it's an AI-curated summary
 
-### AI-Curated Summary (Primary Content)
+### AI-Curated Summary
 - **Organized by topic** (React, JavaScript, Updates, Tools, Design, etc.)
 - **Duplicate removal** - Same news from multiple sources merged
 - **Sponsor filtering** - Ads and promotional content removed
 - **Clean formatting** - Links cleaned, tracking parameters removed
 - **Context preserved** - Each item includes relevant details and source links
-
-### Raw Newsletter Content (Collapsible)
-- Full raw content from all newsletters
-- Nested collapsible sections for each source
-- Useful for reference or if you want to see the original content
-- Each newsletter in a separate expandable section
+- **Concise output** - Kept under 65k characters for readability
 
 ### Footer
 - Generation timestamp
@@ -112,28 +107,14 @@ This is an AI-curated summary of this week's newsletters, organized by topic.
 - New server capabilities
 - [Source: JavaScript Weekly](https://bun.sh)
 
+## 🛠 New Tools
+
+**Triplex - Open Source React Three Fiber Workspace**
+- Visual component builder for 3D scenes
+- Now part of Poimandres Collective
+- [Read more](https://triplex.dev)
+
 [... more organized content ...]
-
----
-
-## 📄 Raw Newsletter Content
-
-<details>
-<summary>Click to view full raw content from all newsletters</summary>
-
-### Console.dev
-<details>
-<summary>Expand Console.dev</summary>
-[Full raw content...]
-</details>
-
-### Web Weekly
-<details>
-<summary>Expand Web Weekly</summary>
-[Full raw content...]
-</details>
-
-</details>
 
 ---
 

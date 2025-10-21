@@ -72,7 +72,7 @@ sources:
     frequency: "daily"
     selector: ".post-days"
     output_format: "markdown"
-    enabled: false
+    enabled: true
 
   - name: "Frontend Focus"
     url: "https://frontendfoc.us/issues/"
@@ -107,7 +107,7 @@ sources:
       - ".promo-box"
       - ".user-form"
     output_format: "markdown"
-    enabled: false
+    enabled: true
 
 # AI Configuration
 ai:

@@ -257,8 +257,7 @@ The workflow is already configured in `.github/workflows/newsletter-digest.yml` 
 1. ✅ Fetch all enabled newsletters
 2. ✅ Generate an AI-curated summary organized by topic
 3. ✅ Create a formatted GitHub issue with the summary
-4. ✅ Add collapsible sections with raw content for reference
-5. ✅ Upload all files as artifacts
+4. ✅ Upload all files as artifacts (for reference)
 
 **Setup Required:**
 - Add `OPENAI_API_KEY` as a repository secret in Settings → Secrets and variables → Actions
@@ -276,10 +275,9 @@ You can manually trigger the workflow anytime:
 Each issue includes:
 - 🤖 Title: `AI Newsletter Digest - [Date]`
 - 📝 **AI-curated summary** organized by topic (React, JavaScript, Tools, etc.)
-- 📄 Raw newsletter content in collapsible sections (for reference)
 - 🏷️ Automatic labels: `newsletter`, `automated`
 
-The AI summary removes duplicates, filters ads/sponsors, and groups related content intelligently.
+The AI summary removes duplicates, filters ads/sponsors, groups related content intelligently, and stays under 65k characters for readability.
 
 For detailed configuration and customization options, see [`docs/github-action.md`](docs/github-action.md).
 
