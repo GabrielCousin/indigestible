@@ -10,7 +10,8 @@ A Python-based newsletter aggregator that fetches, processes, and organizes tech
 - 📝 **Markdown Conversion**: Convert HTML to clean, well-formatted Markdown automatically
 - 📅 **Frequency Tracking**: Track publication frequency (daily, weekly, monthly)
 - 🤖 **AI-Powered Summarization**: Group content by themes using OpenAI
-- 🔄 **GitHub Issues**: (Coming soon) Automatically create GitHub issues with curated content
+- 🔗 **Two-Step Fetch**: Extract newsletter links from archive pages before fetching content
+- 🐙 **GitHub Actions Integration**: Automatically create GitHub issues with weekly digests
 
 ## Installation
 
@@ -82,12 +83,18 @@ ai:
 
 #### Newsletter Sources
 - **name**: A friendly name for the source
-- **url**: The URL to fetch content from
+- **url**: The direct URL to fetch content from (for direct access)
+- **list_page**: Configuration for two-step fetch from archive pages (alternative to `url`)
+  - **url**: The URL of the list/archive page
+  - **link_selector**: CSS selector to find the newsletter link
+  - **link_index**: Which matched link to use (default: 0)
 - **frequency**: Publication frequency (daily, weekly, biweekly, monthly)
 - **selector**: Optional CSS selector to extract specific content
 - **ignore_selectors**: Optional list of CSS selectors to remove (e.g., ads, forms, navigation)
 - **output_format**: Output format - `"markdown"` (default) or `"text"`
 - **enabled**: Whether to process this source (true/false)
+
+**Note**: Use either `url` for direct links or `list_page` for two-step fetch. See [`docs/two-step-fetch.md`](docs/two-step-fetch.md) for details.
 
 #### AI Configuration
 - **model**: OpenAI model to use (e.g., `gpt-4o-mini`, `gpt-5-nano`, `gpt-4o`)
@@ -189,17 +196,25 @@ The fetcher automatically removes noisy elements:
 
 ```
 indigestible/
+├── .github/
+│   └── workflows/
+│       └── newsletter-digest.yml  # GitHub Actions workflow
+├── docs/
+│   ├── github-action.md           # GitHub Action documentation
+│   ├── two-step-fetch.md          # Two-step fetch system guide
+│   └── html-to-markdown.md        # Markdown conversion details
 ├── src/
 │   ├── __init__.py
-│   ├── config.py        # Configuration management
-│   ├── fetcher.py       # HTML fetching and parsing
-│   ├── main.py          # Main execution script
-│   ├── summarizer.py    # AI-powered summarization
-│   └── summarize.py     # Summary generation script
-├── config.yaml          # Source & AI configuration
-├── pyproject.toml       # Project metadata & dependencies
-├── uv.lock              # Locked dependency versions
-├── .env                 # API keys (not committed)
+│   ├── config.py                  # Configuration management
+│   ├── fetcher.py                 # HTML fetching and parsing
+│   ├── main.py                    # Main execution script
+│   ├── summarizer.py              # AI-powered summarization
+│   └── summarize.py               # Summary generation script
+├── output/                        # Generated newsletter content
+├── config.yaml                    # Source & AI configuration
+├── pyproject.toml                 # Project metadata & dependencies
+├── uv.lock                        # Locked dependency versions
+├── .env                           # API keys (not committed)
 ├── .gitignore
 └── README.md
 ```
@@ -218,43 +233,65 @@ indigestible/
 
 ## Roadmap
 
-### Current Version (v0.1)
+### Current Version (v0.2)
 - ✅ Configurable source management
 - ✅ HTML fetching with CSS selector filtering
 - ✅ Markdown conversion
 - ✅ AI-powered summarization with OpenAI
 - ✅ Support for GPT-4o, GPT-5, and o1 models
+- ✅ Two-step fetch system for archive pages
+- ✅ GitHub Actions integration with automated issue creation
 
 ### Upcoming Features
 - 🔄 Duplicate detection and removal
-- 🐙 GitHub issue creation
 - 📊 Content analysis and statistics
-- 🔔 GitHub Actions integration
+- 📧 Email notifications for digest
 
-## GitHub Actions Integration (Coming Soon)
+## GitHub Actions Integration
 
-This tool is designed to run in GitHub Actions on a schedule:
+The project includes a GitHub Action that automatically runs every Monday at 8AM Paris time and creates a GitHub issue with the weekly newsletter digest.
+
+### Quick Start
+
+The workflow is already configured in `.github/workflows/newsletter-digest.yml` and will:
+1. ✅ Fetch all enabled newsletters
+2. ✅ Generate an AI-curated summary organized by topic
+3. ✅ Create a formatted GitHub issue with the summary
+4. ✅ Add collapsible sections with raw content for reference
+5. ✅ Upload all files as artifacts
+
+**Setup Required:**
+- Add `OPENAI_API_KEY` as a repository secret in Settings → Secrets and variables → Actions
+- The AI model is configured in `config.yaml` (default: `gpt-5-nano`)
+
+### Manual Trigger
+
+You can manually trigger the workflow anytime:
+1. Go to **Actions** tab in your repository
+2. Select **Newsletter Digest** workflow
+3. Click **Run workflow**
+
+### Issue Format
+
+Each issue includes:
+- 🤖 Title: `AI Newsletter Digest - [Date]`
+- 📝 **AI-curated summary** organized by topic (React, JavaScript, Tools, etc.)
+- 📄 Raw newsletter content in collapsible sections (for reference)
+- 🏷️ Automatic labels: `newsletter`, `automated`
+
+The AI summary removes duplicates, filters ads/sponsors, and groups related content intelligently.
+
+For detailed configuration and customization options, see [`docs/github-action.md`](docs/github-action.md).
+
+### Schedule Customization
+
+Edit `.github/workflows/newsletter-digest.yml` to change when it runs:
 
 ```yaml
-name: Newsletter Aggregator
 on:
   schedule:
-    - cron: '0 9 * * 1'  # Every Monday at 9 AM
-  workflow_dispatch:
-
-jobs:
-  aggregate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - run: pip install -r requirements.txt
-      - run: python src/main.py
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - cron: '0 6 * * 1'  # 6AM UTC = ~8AM Paris time on Mondays
+  workflow_dispatch:  # Allow manual triggers
 ```
 
 ## License
