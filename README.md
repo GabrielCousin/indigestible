@@ -15,7 +15,7 @@ A Python-based newsletter aggregator that fetches, processes, and organizes tech
 
 ## Installation
 
-### Option 1: Using uv (Recommended - Fast! ⚡)
+This project uses [uv](https://github.com/astral-sh/uv) for fast, reliable dependency management.
 
 1. Install uv if you don't have it:
 ```bash
@@ -36,25 +36,6 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
 That's it! `uv sync` reads `pyproject.toml` and `uv.lock` to create a reproducible environment.
-
-### Option 2: Using standard pip
-
-1. Clone the repository:
-```bash
-git clone <your-repo-url>
-cd indigestible
-```
-
-2. Create a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
 
 ## Configuration
 
@@ -106,8 +87,7 @@ ai:
 
 1. **Fetch newsletters:**
 ```bash
-source .venv/bin/activate  # If not already activated
-python src/main.py
+uv run python src/main.py
 ```
 
 2. **Generate AI summary:**
@@ -125,7 +105,7 @@ ai:
 
 Run the summarizer:
 ```bash
-python src/summarize.py
+uv run python src/summarize.py
 ```
 
 This will create `output/SUMMARY.md` with an organized summary grouped by:
@@ -142,7 +122,7 @@ The summary automatically:
 - Cleans URLs and removes tracking parameters
 - Groups content by theme (not by source)
 
-### Managing Dependencies with uv
+### Managing Dependencies
 
 Add a new dependency:
 ```bash
