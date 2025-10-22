@@ -92,11 +92,15 @@ class ContentSummarizer:
    - ## Misc
 
 2. **Filtering rules:**
+   - ONLY include content from the last 7 days (ignore older content)
    - IGNORE anything related to React Native or mobile development
    - IGNORE framework-specific content EXCEPT React and Node.js
    - REMOVE all sponsor content and advertisements
    - IGNORE job postings and classifieds
    - REMOVE duplicate items (same news from multiple sources - include once only)
+   - REMOVE all call-to-action messages (e.g., "Subscribe", "Follow us", "Get updates", etc.)
+   - REMOVE all footer content (e.g., unsubscribe links, social media links, newsletter metadata)
+   - REMOVE all promotional messages and newsletter sign-up requests
 
 3. **Link handling:**
    - Extract and use FINAL destination URLs (follow redirects in your understanding)
@@ -110,6 +114,7 @@ class ContentSummarizer:
    - Order by importance/relevance within each section
    - Don't mention source names or newsletters
    - Keep descriptions concise (1-2 sentences max)
+   - Do NOT include any footer or closing remarks
 
 5. **Content focus:**
    - Focus on tutorials, libraries, tools, and updates
