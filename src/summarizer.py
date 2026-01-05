@@ -79,7 +79,7 @@ class ContentSummarizer:
             for item in contents
         ])
 
-        prompt = f"""You are a technical newsletter curator. Analyze the following web development newsletter content and create a comprehensive summary.
+        prompt = f"""You are a technical newsletter curator. This is part of automated workflow. Don't ask for any confirmation, do it as a best-effort. Analyze the following web development newsletter content and create a comprehensive summary.
 
 # Instructions:
 
@@ -92,15 +92,16 @@ class ContentSummarizer:
    - ## Misc
 
 2. **Filtering rules:**
-   - ONLY include content from the last 7 days (ignore older content)
+   - ONLY include content from the last 7 days relative to today (ignore older content)
    - IGNORE anything related to React Native or mobile development
-   - IGNORE framework-specific content EXCEPT React and Node.js
+   - IGNORE framework-specific content EXCEPT framework related to React and Node.js
    - REMOVE all sponsor content and advertisements
    - IGNORE job postings and classifieds
    - REMOVE duplicate items (same news from multiple sources - include once only)
    - REMOVE all call-to-action messages (e.g., "Subscribe", "Follow us", "Get updates", etc.)
    - REMOVE all footer content (e.g., unsubscribe links, social media links, newsletter metadata)
    - REMOVE all promotional messages and newsletter sign-up requests
+   - REMOVE a section if it has no matching content
 
 3. **Link handling:**
    - Extract and use FINAL destination URLs (follow redirects in your understanding)
